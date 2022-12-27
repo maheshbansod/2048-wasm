@@ -54,12 +54,9 @@ impl Game {
         if let Ok(score) = self.grid.move_cells(direction) {
             self.score += score;
             // add a random piece
-            if self
-                .grid
-                .add_at_random_position(Game::get_small_piece())
-                .is_err()
-            {
-                // game over since we can't add a piece
+            self.grid.add_at_random_position(Game::get_small_piece())?;
+            // check empty
+            if !self.grid.has_empty() {
                 self.state = GameState::Over;
             }
             Ok(())

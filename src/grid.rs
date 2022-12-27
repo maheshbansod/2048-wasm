@@ -41,6 +41,10 @@ impl Grid {
             .collect()
     }
 
+    pub fn has_empty(&self) -> bool {
+        self.grid.iter().any(|&c| c == 0)
+    }
+
     pub fn add_at_random_position(&mut self, value: u32) -> Result<(), String> {
         let empty_cells = self.empty_cells();
         if empty_cells.is_empty() {
