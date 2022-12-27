@@ -5,6 +5,8 @@ use std::fmt::Display;
 use rand::seq::SliceRandom;
 use wasm_bindgen::prelude::*;
 
+use crate::utils::set_panic_hook;
+
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
@@ -19,7 +21,7 @@ pub struct Game {
 }
 
 #[wasm_bindgen]
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum GameState {
     Playing,
     Over,
@@ -37,7 +39,7 @@ struct GridCoord {
 }
 
 #[wasm_bindgen]
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum Direction {
     LEFT,
     RIGHT,
@@ -78,7 +80,7 @@ impl Grid {
         let empty_cells = self.empty_cells();
         let cell = empty_cells
             .choose(&mut rand::thread_rng())
-            .ok_or("No empty cell found apparently".to_string())?;
+            .ok_or_else(|| "No empty cell found apparently".to_string())?;
         let idx = self.get_index_from_coord(*cell);
         self.grid[idx].value = Some(value);
         Ok(())
@@ -147,6 +149,7 @@ impl From<(usize, usize)> for GridCoord {
 #[wasm_bindgen]
 impl Game {
     pub fn new() -> Self {
+        set_panic_hook();
         let mut game = Self {
             state: GameState::Playing,
             score: 0,
@@ -179,6 +182,12 @@ impl Game {
     fn get_small_piece() -> u32 {
         let pieces = [2, 4];
         *pieces.choose(&mut rand::thread_rng()).unwrap()
+    }
+}
+
+impl Default for Game {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
