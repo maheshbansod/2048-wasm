@@ -54,10 +54,11 @@ impl Grid {
     }
 
     // returns the score of the move
-    pub fn move_cells(&mut self, direction: Direction) -> u32 {
+    pub fn move_cells(&mut self, direction: Direction) -> Result<u32, String> {
         let mut score = 0;
         let is_vertical = direction == Direction::Up || direction == Direction::Down;
         let is_down_or_right = direction == Direction::Right || direction == Direction::Down;
+        let mut moved = false;
         for line in 0..self.size {
             let mut main_iter: Box<dyn Iterator<Item = usize>> = if is_down_or_right {
                 Box::new((1..self.size).rev())
@@ -85,6 +86,7 @@ impl Grid {
                                 score += new_val;
                                 self.grid[last_idx] = new_val;
                                 self.grid[idx] = 0;
+                                moved = true;
                             }
                             break;
                         } else {
@@ -92,12 +94,17 @@ impl Grid {
                             // set last cell and clear current
                             self.grid[last_idx] = cell;
                             self.grid[idx] = 0;
+                            moved = true;
                         }
                     }
                 }
             }
         }
-        score
+        if moved {
+            Ok(score)
+        } else {
+            Err("Illegal move".into())
+        }
     }
 
     pub fn cells(&self) -> *const Cell {
@@ -168,7 +175,7 @@ mod tests {
     #[test]
     fn swipe_right() {
         let mut grid = Grid::new_grid(4, vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]);
-        grid.move_cells(Direction::Right);
+        grid.move_cells(Direction::Right).unwrap();
 
         assert_eq!(
             vec![0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 0, 4, 0, 3, 4, 4,],
@@ -179,7 +186,7 @@ mod tests {
     #[test]
     fn swipe_left() {
         let mut grid = Grid::new_grid(4, vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]);
-        grid.move_cells(Direction::Left);
+        grid.move_cells(Direction::Left).unwrap();
 
         assert_eq!(
             vec![2, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 3, 4, 4, 0],
@@ -190,7 +197,7 @@ mod tests {
     #[test]
     fn swipe_up() {
         let mut grid = Grid::new_grid(4, vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]);
-        grid.move_cells(Direction::Up);
+        grid.move_cells(Direction::Up).unwrap();
 
         assert_eq!(
             vec![4, 4, 4, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
@@ -201,7 +208,7 @@ mod tests {
     #[test]
     fn swipe_down() {
         let mut grid = Grid::new_grid(4, vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]);
-        grid.move_cells(Direction::Down);
+        grid.move_cells(Direction::Down).unwrap();
 
         assert_eq!(
             vec![0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 3, 4, 4, 2,],

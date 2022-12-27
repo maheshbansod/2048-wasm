@@ -51,7 +51,11 @@ impl Game {
         if self.state == GameState::Over {
             return Err("The game is over".into());
         }
-        let score = self.grid.move_cells(direction);
+        let score = if let Ok(score) = self.grid.move_cells(direction) {
+            score
+        } else {
+            return Err("Illegal move".into());
+        };
         self.score += score;
         // add a random piece
         if self
