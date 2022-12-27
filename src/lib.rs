@@ -152,7 +152,9 @@ impl Game {
             score: 0,
             grid: Grid::new(4),
         };
-        game.grid.add_at_random_position(Game::get_small_piece());
+        game.grid
+            .add_at_random_position(Game::get_small_piece())
+            .unwrap();
         game
     }
 
