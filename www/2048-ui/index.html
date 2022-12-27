@@ -3,13 +3,62 @@
 
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hello wasm-pack!</title>
+  <style>
+    div {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      width: 100vw;
+      overflow: hidden;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    #game-stat {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+
+      background-color: burlywood;
+      padding: 1rem;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score {
+      font-size: 3rem;
+    }
+  </style>
+
 </head>
 
 <body>
   <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
   <script src="./bootstrap.js"></script>
-  <canvas id="game-canvas"></canvas>
+  <div id="app">
+    <div id="game-stat">
+      <div class="score-wrapper">
+        Score
+        <div id="score" class="score">
+        </div>
+      </div>
+      <div id="game-state">
+      </div>
+      <div class="score-wrapper">
+        High score
+        <div id="high-score" class="score">
+        </div>
+      </div>
+    </div>
+    <canvas id="game-canvas"></canvas>
+  </div>
 </body>
 
 </html>

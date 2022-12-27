@@ -1,6 +1,5 @@
 import { memory } from "2048-rs/twentyfortyeight_bg.wasm";
 
-
 const GRID_SIZE = 4; // number of rows = cols
 const CELL_SIZE = 80; // cell size in px
 const CELL_PADDING = 4; // cell padding on both sides in px
