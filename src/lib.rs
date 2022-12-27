@@ -51,22 +51,21 @@ impl Game {
         if self.state == GameState::Over {
             return Err("The game is over".into());
         }
-        let score = if let Ok(score) = self.grid.move_cells(direction) {
-            score
+        if let Ok(score) = self.grid.move_cells(direction) {
+            self.score += score;
+            // add a random piece
+            if self
+                .grid
+                .add_at_random_position(Game::get_small_piece())
+                .is_err()
+            {
+                // game over since we can't add a piece
+                self.state = GameState::Over;
+            }
+            Ok(())
         } else {
-            return Err("Illegal move".into());
-        };
-        self.score += score;
-        // add a random piece
-        if self
-            .grid
-            .add_at_random_position(Game::get_small_piece())
-            .is_err()
-        {
-            // game over since we can't add a piece
-            self.state = GameState::Over;
+            Err("Illegal move".into())
         }
-        Ok(())
     }
 
     pub fn cells(&self) -> *const Cell {
