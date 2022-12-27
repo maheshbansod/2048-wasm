@@ -59,10 +59,6 @@ impl Grid {
         Self { size, grid }
     }
 
-    fn new_grid(size: usize, grid: Vec<Cell>) -> Self {
-        Self { size, grid }
-    }
-
     fn empty_cells(&self) -> Vec<GridCoord> {
         (0..self.size as usize)
             .flat_map(|i| {
@@ -137,13 +133,6 @@ impl Grid {
         score
     }
 
-    pub fn get_grid(&self) -> Vec<u32> {
-        self.grid
-            .iter()
-            .map(|x| if let Some(val) = x.value { val } else { 0 })
-            .collect()
-    }
-
     fn get_index_from_coord(&self, coord: GridCoord) -> usize {
         coord.y * self.size + coord.x
     }
@@ -194,6 +183,20 @@ impl Game {
 #[cfg(test)]
 mod tests {
     use crate::{Cell, Direction, Grid};
+
+    // helper functions
+    impl Grid {
+        fn new_grid(size: usize, grid: Vec<Cell>) -> Self {
+            Self { size, grid }
+        }
+
+        fn get_grid(&self) -> Vec<u32> {
+            self.grid
+                .iter()
+                .map(|x| if let Some(val) = x.value { val } else { 0 })
+                .collect()
+        }
+    }
 
     #[test]
     fn swipe_right() {
