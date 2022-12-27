@@ -54,13 +54,12 @@ impl Game {
         if let Ok(score) = self.grid.move_cells(direction) {
             self.score += score;
             // add a random piece
-            self.grid.add_at_random_position(Game::get_small_piece())?;
-            // check empty
-            if !self.grid.has_empty() {
-                self.state = GameState::Over;
-            }
+            self.grid.add_at_random_position(Game::get_small_piece())?; // will never fail - since movement means at least one place was free
             Ok(())
         } else {
+            if self.grid.is_game_over() {
+                self.state = GameState::Over;
+            }
             Err("Illegal move".into())
         }
     }

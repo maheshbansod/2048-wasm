@@ -41,8 +41,34 @@ impl Grid {
             .collect()
     }
 
-    pub fn has_empty(&self) -> bool {
-        self.grid.iter().any(|&c| c == 0)
+    pub fn is_game_over(&self) -> bool {
+        let has_empty = self.grid.iter().any(|&c| c == 0);
+        if has_empty {
+            return false;
+        }
+        let has_free_horizontal = self
+            .grid
+            .iter()
+            .zip(self.grid.iter().skip(1))
+            .enumerate()
+            .filter(|(i, (&curr, &next))| i + 1 % self.size != 0 && curr == next)
+            .next()
+            .is_some();
+        if has_free_horizontal {
+            return false;
+        }
+
+        for i in 0..self.size {
+            let mut prev = 0;
+            for j in 0..self.size {
+                let idx = self.get_index_from_coord(GridCoord { x: i, y: j });
+                if self.grid[idx] == prev {
+                    return false; // found a vertical
+                }
+                prev = self.grid[idx];
+            }
+        }
+        return true;
     }
 
     pub fn add_at_random_position(&mut self, value: u32) -> Result<(), String> {
