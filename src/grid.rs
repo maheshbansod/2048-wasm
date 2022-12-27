@@ -101,7 +101,7 @@ impl Grid {
     }
 
     pub fn cells(&self) -> *const Cell {
-        self.grid.as_ptr()
+        self.grid.as_slice().as_ptr()
     }
 
     fn get_index_from_coord(&self, coord: GridCoord) -> usize {
