@@ -8,12 +8,13 @@ const CELL_PADDING = 4; // cell padding on both sides in px
 const TOTAL_CELL_SIZE = CELL_SIZE + 2 * CELL_PADDING;
 
 const theme = {
-    LINE_COLOR: 'grey', // grid bg color
+    LINE_COLOR: 'grey',
     CELL_COLOR: 'green',
     TEXT_COLOR: 'white',
+    BG_COLOR: 'white',
 }
 
-const getIndex = (x, y) => x * GRID_SIZE + y;
+const getIndex = (x, y) => y * GRID_SIZE + x;
 
 export class GameRenderer {
     // game;
@@ -33,6 +34,8 @@ export class GameRenderer {
     }
 
     drawGrid() {
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.beginPath();
         this.ctx.strokeStyle = theme.LINE_COLOR;
 
@@ -54,16 +57,18 @@ export class GameRenderer {
     fillGrid() {
         const cellsPtr = this.game.cells();
         const cells = new Uint32Array(memory.buffer, cellsPtr, GRID_SIZE * GRID_SIZE);
+        window.cells = cells;
 
         this.ctx.beginPath();
-        this.ctx.fillStyle = theme.CELL_COLOR;
 
         for (let i = 0; i < GRID_SIZE; i++) {
             for (let j = 0; j < GRID_SIZE; j++) {
                 const idx = getIndex(j, i);
+                cell_str += cells[idx];
                 if (cells[idx] === 0) continue;
-                const rectx = TOTAL_CELL_SIZE * i + CELL_PADDING;
-                const recty = TOTAL_CELL_SIZE * j + CELL_PADDING;
+                this.ctx.fillStyle = theme.CELL_COLOR;
+                const rectx = TOTAL_CELL_SIZE * j + CELL_PADDING;
+                const recty = TOTAL_CELL_SIZE * i + CELL_PADDING;
                 this.ctx.fillRect(rectx, recty, CELL_SIZE, CELL_SIZE);
                 this.ctx.fillStyle = theme.TEXT_COLOR;
                 this.ctx.fillText(`${cells[idx]}`, rectx + CELL_SIZE / 2, recty + CELL_SIZE / 2);
