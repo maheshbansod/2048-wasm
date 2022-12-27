@@ -73,6 +73,10 @@ impl Game {
         let idx = (js_sys::Math::random() * 2f64).floor() as usize;
         pieces[idx]
     }
+
+    pub fn score(&self) -> u32 {
+        self.score
+    }
 }
 
 impl Default for Game {
