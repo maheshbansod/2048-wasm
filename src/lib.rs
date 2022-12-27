@@ -10,6 +10,7 @@ use crate::{
 };
 
 extern crate js_sys;
+extern crate web_sys;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
