@@ -60,7 +60,6 @@ export class GameRenderer {
     fillGrid() {
         const cellsPtr = this.game.cells();
         const cells = new Uint32Array(memory.buffer, cellsPtr, GRID_SIZE * GRID_SIZE);
-        window.cells = cells;
 
         this.ctx.beginPath();
 
