@@ -23,7 +23,7 @@ export function addEventListeners(game) {
                     break;
                 }
                 case DOWN_KEY: {
-                    game.play_swipe(Direction.Right);
+                    game.play_swipe(Direction.Down);
                     break;
                 }
             }
