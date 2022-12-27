@@ -2,10 +2,11 @@ mod grid;
 mod utils;
 
 use grid::Grid;
-use rand::seq::SliceRandom;
 use wasm_bindgen::prelude::*;
 
 use crate::{grid::Direction, utils::set_panic_hook};
+
+extern crate js_sys;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -62,7 +63,8 @@ impl Game {
 
     fn get_small_piece() -> u32 {
         let pieces = [2, 4];
-        *pieces.choose(&mut rand::thread_rng()).unwrap()
+        let idx = (js_sys::Math::random() * 2f64).floor() as usize;
+        pieces[idx]
     }
 }
 

@@ -1,6 +1,5 @@
 use std::fmt::Display;
 
-use rand::seq::SliceRandom;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 pub struct Grid {
@@ -54,10 +53,12 @@ impl Grid {
 
     pub fn add_at_random_position(&mut self, value: u32) -> Result<(), String> {
         let empty_cells = self.empty_cells();
-        let cell = empty_cells
-            .choose(&mut rand::thread_rng())
-            .ok_or_else(|| "No empty cell found apparently".to_string())?;
-        let idx = self.get_index_from_coord(*cell);
+        if empty_cells.is_empty() {
+            return Err("No empty cell found apparently".to_string());
+        }
+        let random_idx = (js_sys::Math::random() * empty_cells.len() as f64).floor() as usize;
+        let cell = empty_cells[random_idx];
+        let idx = self.get_index_from_coord(cell);
         self.grid[idx].value = Some(value);
         Ok(())
     }
