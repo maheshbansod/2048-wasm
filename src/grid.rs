@@ -22,17 +22,11 @@ pub enum Direction {
     Down,
 }
 
-#[derive(Debug, Clone, Copy)]
-struct Cell {
-    value: Option<u32>,
-}
+pub type Cell = u32;
 
 impl Grid {
     pub fn new(size: usize) -> Self {
-        let grid = (0..size * size)
-            .into_iter()
-            .map(|_i| Cell { value: None })
-            .collect::<Vec<Cell>>();
+        let grid = vec![0; size * size];
         Self { size, grid }
     }
 
@@ -41,11 +35,7 @@ impl Grid {
             .flat_map(|i| {
                 (0..self.size as usize)
                     .map(move |j| (i, j))
-                    .filter(|&(i, j)| {
-                        self.grid[self.get_index_from_coord((i, j).into())]
-                            .value
-                            .is_none()
-                    })
+                    .filter(|&(i, j)| self.grid[self.get_index_from_coord((i, j).into())] == 0)
             })
             .map(|x| x.into())
             .collect()
@@ -59,7 +49,7 @@ impl Grid {
         let random_idx = (js_sys::Math::random() * empty_cells.len() as f64).floor() as usize;
         let cell = empty_cells[random_idx];
         let idx = self.get_index_from_coord(cell);
-        self.grid[idx].value = Some(value);
+        self.grid[idx] = value;
         Ok(())
     }
 
@@ -87,29 +77,31 @@ impl Grid {
                     let coords = if is_vertical { (line, j) } else { (j, line) };
                     let idx = self.get_index_from_coord(coords.into());
                     let cell = self.grid[idx];
-                    if let Some(val) = cell.value {
-                        if let Some(last_val) = last_cell.value {
-                            if last_val == val {
+                    if cell != 0 {
+                        if last_cell != 0 {
+                            if last_cell == cell {
                                 // add and store in last, and clear current
-                                let new_val = 2 * val;
+                                let new_val = 2 * cell;
                                 score += new_val;
-                                self.grid[last_idx] = Cell {
-                                    value: Some(new_val),
-                                };
-                                self.grid[idx] = Cell { value: None };
+                                self.grid[last_idx] = new_val;
+                                self.grid[idx] = 0;
                             }
                             break;
                         } else {
                             // last cell is empty
                             // set last cell and clear current
-                            self.grid[last_idx] = Cell { value: Some(val) };
-                            self.grid[idx] = Cell { value: None };
+                            self.grid[last_idx] = cell;
+                            self.grid[idx] = 0;
                         }
                     }
                 }
             }
         }
         score
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.grid.as_ptr()
     }
 
     fn get_index_from_coord(&self, coord: GridCoord) -> usize {
@@ -143,9 +135,9 @@ impl Display for Grid {
                             .into_iter()
                             .map(move |j| {
                                 let idx = self.get_index_from_coord((j, i).into());
-                                let cell = &self.grid[idx];
-                                if let Some(val) = cell.value {
-                                    val.to_string()
+                                let cell = self.grid[idx];
+                                if cell != 0 {
+                                    cell.to_string()
                                 } else {
                                     "_".to_string()
                                 }
@@ -169,28 +161,13 @@ mod tests {
         }
 
         fn get_grid(&self) -> Vec<u32> {
-            self.grid
-                .iter()
-                .map(|x| if let Some(val) = x.value { val } else { 0 })
-                .collect()
+            self.grid.clone()
         }
     }
 
     #[test]
     fn swipe_right() {
-        let mut grid = Grid::new_grid(
-            4,
-            vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]
-                .iter()
-                .map(|&x| {
-                    if x == 0 {
-                        Cell { value: None }
-                    } else {
-                        Cell { value: Some(x) }
-                    }
-                })
-                .collect(),
-        );
+        let mut grid = Grid::new_grid(4, vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]);
         grid.move_cells(Direction::Right);
 
         assert_eq!(
@@ -201,19 +178,7 @@ mod tests {
 
     #[test]
     fn swipe_left() {
-        let mut grid = Grid::new_grid(
-            4,
-            vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]
-                .iter()
-                .map(|&x| {
-                    if x == 0 {
-                        Cell { value: None }
-                    } else {
-                        Cell { value: Some(x) }
-                    }
-                })
-                .collect(),
-        );
+        let mut grid = Grid::new_grid(4, vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]);
         grid.move_cells(Direction::Left);
 
         assert_eq!(
@@ -224,19 +189,7 @@ mod tests {
 
     #[test]
     fn swipe_up() {
-        let mut grid = Grid::new_grid(
-            4,
-            vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]
-                .iter()
-                .map(|&x| {
-                    if x == 0 {
-                        Cell { value: None }
-                    } else {
-                        Cell { value: Some(x) }
-                    }
-                })
-                .collect(),
-        );
+        let mut grid = Grid::new_grid(4, vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]);
         grid.move_cells(Direction::Up);
 
         assert_eq!(
@@ -247,19 +200,7 @@ mod tests {
 
     #[test]
     fn swipe_down() {
-        let mut grid = Grid::new_grid(
-            4,
-            vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]
-                .iter()
-                .map(|&x| {
-                    if x == 0 {
-                        Cell { value: None }
-                    } else {
-                        Cell { value: Some(x) }
-                    }
-                })
-                .collect(),
-        );
+        let mut grid = Grid::new_grid(4, vec![0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 2, 0, 3, 4, 2, 2]);
         grid.move_cells(Direction::Down);
 
         assert_eq!(

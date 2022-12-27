@@ -4,7 +4,10 @@ mod utils;
 use grid::Grid;
 use wasm_bindgen::prelude::*;
 
-use crate::{grid::Direction, utils::set_panic_hook};
+use crate::{
+    grid::{Cell, Direction},
+    utils::set_panic_hook,
+};
 
 extern crate js_sys;
 
@@ -59,6 +62,10 @@ impl Game {
             self.state = GameState::Over;
         }
         Ok(())
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.grid.cells()
     }
 
     fn get_small_piece() -> u32 {
