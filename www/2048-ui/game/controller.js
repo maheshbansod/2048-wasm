@@ -12,17 +12,20 @@ const ARROW_KEY_DIRECTION_MAPPING = {
     [RIGHT_KEY]: Direction.Right,
 };
 
-export function addEventListeners(canvas, game, cb) {
+export function addEventListeners(canvas, game, callbacks) {
 
-    const doSwipe = (direction) => {
+    const doMove = (direction) => {
         try {
             game.play_swipe(direction);
-            if (cb)
-                cb();
+            if (callbacks && callbacks.onMoveSuccess)
+                callbacks.onMoveSuccess();
         } catch (e) {
             if (e == "Illegal move") {
                 // ignore error
             }
+        }
+        if (callbacks && callbacks.afterMove) {
+            callbacks.afterMove();
         }
     }
 
@@ -30,14 +33,14 @@ export function addEventListeners(canvas, game, cb) {
     canvas.addEventListener("touchmove", (e) => {
         let d = moveTouch(e);
         if (d !== undefined) {
-            doSwipe(d);
+            doMove(d);
         }
     }, false);
 
     document.addEventListener('keyup', function (e) {
         const code = e.code;
         if (Object.hasOwn(ARROW_KEY_DIRECTION_MAPPING, code)) {
-            doSwipe(ARROW_KEY_DIRECTION_MAPPING[code]);
+            doMove(ARROW_KEY_DIRECTION_MAPPING[code]);
         }
     });
 };

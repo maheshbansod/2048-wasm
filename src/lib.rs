@@ -36,6 +36,17 @@ pub enum GameState {
 impl Game {
     pub fn new() -> Self {
         set_panic_hook();
+        Self::new_game()
+    }
+
+    pub fn reset(&mut self) {
+        let game = Self::new_game();
+        self.grid = game.grid;
+        self.score = game.score;
+        self.state = game.state;
+    }
+
+    fn new_game() -> Self {
         let mut game = Self {
             state: GameState::Playing,
             score: 0,

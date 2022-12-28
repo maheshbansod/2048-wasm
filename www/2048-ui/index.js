@@ -6,7 +6,7 @@ import { GameRenderer } from "./game/render-game";
 import { getFromLocalStorage, setLocalStorage } from "./utils";
 
 const canvas = document.getElementById("game-canvas");
-const gameStateElem = document.getElementById('game-state');
+const gameStateElem = document.getElementById('game-over');
 const currentScoreElem = document.getElementById("score");
 const highScoreElem = document.getElementById('high-score');
 let highScore = getFromLocalStorage(STORAGE_KEYS.HIGH_SCORE);
@@ -40,16 +40,21 @@ updateScore();
 const updateGameState = () => {
     const state = game.state();
     if (state == GameState.Over) {
-        gameStateElem.textContent = "Game over";
+        gameStateElem.classList.remove('hidden');
     }
 }
 
-const afterMove = () => {
-    updateScore();
-    updateGameState();
-}
+const restartGame = () => {
+    game.reset();
+    gameStateElem.classList.add('hidden');
+};
 
-addEventListeners(canvas, game, afterMove);
+document.getElementById('try-again-btn').addEventListener('click', restartGame);
+
+addEventListeners(canvas, game, {
+    onMoveSuccess: updateScore,
+    afterMove: updateGameState
+});
 
 const renderLoop = () => {
     renderer.drawGrid();

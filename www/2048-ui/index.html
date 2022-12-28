@@ -36,6 +36,20 @@
     .score {
       font-size: 3rem;
     }
+
+    #game-over {
+      text-align: center;
+    }
+
+    #try-again-btn {
+      padding: 0.5rem 2rem;
+      margin: 0.2rem;
+      background-color: seashell;
+    }
+
+    .hidden {
+      display: none;
+    }
   </style>
 
 </head>
@@ -50,7 +64,11 @@
         <div id="score" class="score">
         </div>
       </div>
-      <div id="game-state">
+      <div id="game-over" class="hidden">
+        <div>
+          Game over
+        </div>
+        <button id="try-again-btn">Try again</button>
       </div>
       <div class="score-wrapper">
         High score
