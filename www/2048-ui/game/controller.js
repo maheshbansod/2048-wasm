@@ -5,8 +5,6 @@ const DOWN_KEY = 'ArrowDown';
 const LEFT_KEY = 'ArrowLeft';
 const RIGHT_KEY = 'ArrowRight';
 
-const UNHANDLED_KEY_MESSAGE = "Unhandled keys";
-
 const ARROW_KEY_DIRECTION_MAPPING = {
     [UP_KEY]: Direction.Up,
     [DOWN_KEY]: Direction.Down,
