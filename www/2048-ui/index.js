@@ -1,11 +1,12 @@
 
-import { Game } from "2048-rs";
+import { Game, GameState } from "2048-rs";
 import { STORAGE_KEYS } from "./constants";
 import { addEventListeners } from "./game/controller";
 import { GameRenderer } from "./game/render-game";
 import { getFromLocalStorage, setLocalStorage } from "./utils";
 
 const canvas = document.getElementById("game-canvas");
+const gameStateElem = document.getElementById('game-state');
 const currentScoreElem = document.getElementById("score");
 const highScoreElem = document.getElementById('high-score');
 let highScore = getFromLocalStorage(STORAGE_KEYS.HIGH_SCORE);
@@ -36,7 +37,19 @@ const updateScore = () => {
 updateHighScore();
 updateScore();
 
-addEventListeners(canvas, game, updateScore);
+const updateGameState = () => {
+    const state = game.state();
+    if (state == GameState.Over) {
+        gameStateElem.textContent = "Game over";
+    }
+}
+
+const afterMove = () => {
+    updateScore();
+    updateGameState();
+}
+
+addEventListeners(canvas, game, afterMove);
 
 const renderLoop = () => {
     renderer.drawGrid();

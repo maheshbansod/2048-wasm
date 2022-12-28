@@ -26,7 +26,7 @@ pub struct Game {
 }
 
 #[wasm_bindgen]
-#[derive(PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub enum GameState {
     Playing,
     Over,
@@ -55,11 +55,11 @@ impl Game {
             self.score += score;
             // add a random piece
             self.grid.add_at_random_position(Game::get_small_piece())?; // will never fail - since movement means at least one place was free
-            Ok(())
-        } else {
             if self.grid.is_game_over() {
                 self.state = GameState::Over;
             }
+            Ok(())
+        } else {
             Err("Illegal move".into())
         }
     }
@@ -76,6 +76,10 @@ impl Game {
 
     pub fn score(&self) -> u32 {
         self.score
+    }
+
+    pub fn state(&self) -> GameState {
+        self.state
     }
 }
 
