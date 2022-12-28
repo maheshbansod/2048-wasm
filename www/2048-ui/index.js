@@ -47,6 +47,7 @@ const updateGameState = () => {
 const restartGame = () => {
     game.reset();
     gameStateElem.classList.add('hidden');
+    updateHighScore();
 };
 
 document.getElementById('try-again-btn').addEventListener('click', restartGame);
