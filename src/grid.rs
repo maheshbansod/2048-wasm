@@ -51,9 +51,7 @@ impl Grid {
             .iter()
             .zip(self.grid.iter().skip(1))
             .enumerate()
-            .filter(|(i, (&curr, &next))| i + 1 % self.size != 0 && curr == next)
-            .next()
-            .is_some();
+            .any(|(i, (&curr, &next))| i + 1 % self.size != 0 && curr == next);
         if has_free_horizontal {
             return false;
         }
@@ -68,7 +66,7 @@ impl Grid {
                 prev = self.grid[idx];
             }
         }
-        return true;
+        true
     }
 
     pub fn add_at_random_position(&mut self, value: u32) -> Result<(), String> {
