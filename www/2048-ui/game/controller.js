@@ -38,7 +38,7 @@ export function addEventListeners(canvas, game, cb) {
 
     document.addEventListener('keyup', function (e) {
         const code = e.code;
-        if (ARROW_KEY_DIRECTION_MAPPING[code]) {
+        if (ARROW_KEY_DIRECTION_MAPPING[code] !== undefined) {
             doSwipe(ARROW_KEY_DIRECTION_MAPPING[code]);
         }
     });
