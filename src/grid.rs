@@ -51,7 +51,7 @@ impl Grid {
             .iter()
             .zip(self.grid.iter().skip(1))
             .enumerate()
-            .any(|(i, (&curr, &next))| i + 1 % self.size != 0 && curr == next);
+            .any(|(i, (&curr, &next))| (i + 1) % self.size != 0 && curr == next);
         if has_free_horizontal {
             return false;
         }
