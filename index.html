@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2048</title>
+  <style>
+    div {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      width: 100vw;
+      overflow: hidden;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    #game-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+
+      background-color: burlywood;
+      padding: 1rem;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score {
+      font-size: 3rem;
+    }
+
+    #game-over {
+      text-align: center;
+    }
+
+    #try-again-btn {
+      padding: 0.5rem 2rem;
+      margin: 0.2rem;
+      background-color: seashell;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+
+</head>
+
+<body>
+  <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+  <script src="./bootstrap.js"></script>
+  <div id="app">
+    <div id="game-stat">
+      <div class="score-wrapper">
+        Score
+        <div id="score" class="score">
+        </div>
+      </div>
+      <div>
+        <div id="game-over" class="hidden">
+          Game over
+        </div>
+        <button type="button" id="try-again-btn">New game</button>
+      </div>
+      <div class="score-wrapper">
+        High score
+        <div id="high-score" class="score">
+        </div>
+      </div>
+    </div>
+    <canvas id="game-canvas"></canvas>
+  </div>
+</body>
+
+</html>
