@@ -7,14 +7,24 @@ const FONT_FAMILY = 'Arial';
 
 const TOTAL_CELL_SIZE = CELL_SIZE + 2 * CELL_PADDING;
 
-const MOVE_ANIMATE_TIME = 100; // in ms
+const MOVE_ANIMATE_TIME = 75; // in ms
 
-const theme = {
+const lightTheme = {
     LINE_COLOR: 'grey',
-    CELL_COLOR: 'green',
+    CELL_COLOR(value) {
+        let value_str = `${value}`;
+        if (value_str.length == 1) {
+            return 'burlywood';
+        } else if (value_str.length == 2) {
+            return '#87ded0';
+        } else {
+            return '#c37aef';
+        }
+    },
     TEXT_COLOR: 'white',
     BG_COLOR: 'white',
-}
+};
+const theme = lightTheme;
 
 const getIndex = (x, y) => y * GRID_SIZE + x;
 
@@ -38,7 +48,7 @@ export class GameRenderer {
     }
 
     drawGrid() {
-        this.ctx.fillStyle = 'black';
+        this.ctx.fillStyle = theme.BG_COLOR;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.beginPath();
         this.ctx.strokeStyle = theme.LINE_COLOR;
@@ -109,7 +119,7 @@ export class GameRenderer {
     renderCell(value, x, y) {
 
         // render rect
-        this.ctx.fillStyle = theme.CELL_COLOR;
+        this.ctx.fillStyle = theme.CELL_COLOR(value);
         const rectx = TOTAL_CELL_SIZE * x + CELL_PADDING;
         const recty = TOTAL_CELL_SIZE * y + CELL_PADDING;
         this.ctx.fillRect(rectx, recty, CELL_SIZE, CELL_SIZE);
