@@ -44,6 +44,11 @@ const updateGameState = () => {
     }
 }
 
+const onMoveSuccess = (update) => {
+    updateScore();
+    animationStart(update);
+}
+
 const restartGame = () => {
     game.reset();
     gameStateElem.classList.add('hidden');
@@ -53,14 +58,23 @@ const restartGame = () => {
 document.getElementById('try-again-btn').addEventListener('click', restartGame);
 
 addEventListeners(canvas, game, {
-    onMoveSuccess: updateScore,
+    onMoveSuccess,
     afterMove: updateGameState
 });
 
-const renderLoop = () => {
-    renderer.drawGrid();
-    renderer.fillGrid();
+let animatingUpdate = null;
 
+const animationStart = (update) => {
+    animatingUpdate = update;
+};
+
+let lastTime = 0;
+const renderLoop = () => {
+    const dt = performance.now() - lastTime;
+    renderer.drawGrid();
+    renderer.fillGrid(animatingUpdate, dt, () => { animatingUpdate = null; });
+
+    lastTime = performance.now();
     requestAnimationFrame(renderLoop);
 }
 

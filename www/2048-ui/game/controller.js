@@ -16,9 +16,9 @@ export function addEventListeners(canvas, game, callbacks) {
 
     const doMove = (direction) => {
         try {
-            game.play_swipe(direction);
+            const update = game.play_swipe(direction);
             if (callbacks && callbacks.onMoveSuccess)
-                callbacks.onMoveSuccess();
+                callbacks.onMoveSuccess({ ...update, dt: 0 });
         } catch (e) {
             if (e == "Illegal move") {
                 // ignore error

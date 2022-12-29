@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 pub struct Grid {
@@ -7,8 +8,8 @@ pub struct Grid {
     grid: Vec<Cell>,
 }
 
-#[derive(Debug, Clone, Copy)]
-struct GridCoord {
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct GridCoord {
     x: usize,
     y: usize,
 }
@@ -23,6 +24,13 @@ pub enum Direction {
 }
 
 pub type Cell = u32;
+
+#[derive(Serialize, Deserialize)]
+pub struct MoveTransition {
+    value: u32,
+    before: GridCoord,
+    after: GridCoord,
+}
 
 impl Grid {
     pub fn new(size: usize) -> Self {
@@ -69,7 +77,7 @@ impl Grid {
         true
     }
 
-    pub fn add_at_random_position(&mut self, value: u32) -> Result<(), String> {
+    pub fn add_at_random_position(&mut self, value: u32) -> Result<GridCoord, String> {
         let empty_cells = self.empty_cells();
         if empty_cells.is_empty() {
             return Err("No empty cell found apparently".to_string());
@@ -78,15 +86,18 @@ impl Grid {
         let cell = empty_cells[random_idx];
         let idx = self.get_index_from_coord(cell);
         self.grid[idx] = value;
-        Ok(())
+        Ok(cell)
     }
 
     // returns the score of the move
-    pub fn move_cells(&mut self, direction: Direction) -> Result<u32, String> {
+    pub fn move_cells(
+        &mut self,
+        direction: Direction,
+    ) -> Result<(u32, Vec<MoveTransition>), String> {
         let mut score = 0;
         let is_vertical = direction == Direction::Up || direction == Direction::Down;
         let is_down_or_right = direction == Direction::Right || direction == Direction::Down;
-        let mut moved = false;
+        let mut moves = vec![];
         for line in 0..self.size {
             let mut main_iter: Box<dyn Iterator<Item = usize>> = if is_down_or_right {
                 Box::new((1..self.size).rev())
@@ -113,23 +124,31 @@ impl Grid {
                                 let new_val = 2 * cell;
                                 score += new_val;
                                 self.grid[last_idx] = new_val;
+                                moves.push(MoveTransition {
+                                    value: self.grid[idx],
+                                    before: coords.into(),
+                                    after: last_coords.into(),
+                                });
                                 self.grid[idx] = 0;
-                                moved = true;
                             }
                             break;
                         } else {
                             // last cell is empty
                             // set last cell and clear current
                             self.grid[last_idx] = cell;
+                            moves.push(MoveTransition {
+                                value: self.grid[idx],
+                                before: coords.into(),
+                                after: last_coords.into(),
+                            });
                             self.grid[idx] = 0;
-                            moved = true;
                         }
                     }
                 }
             }
         }
-        if moved {
-            Ok(score)
+        if !moves.is_empty() {
+            Ok((score, moves))
         } else {
             Err("Illegal move".into())
         }

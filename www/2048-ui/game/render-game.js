@@ -7,6 +7,8 @@ const FONT_FAMILY = 'Arial';
 
 const TOTAL_CELL_SIZE = CELL_SIZE + 2 * CELL_PADDING;
 
+const MOVE_ANIMATE_TIME = 100; // in ms
+
 const theme = {
     LINE_COLOR: 'grey',
     CELL_COLOR: 'green',
@@ -56,17 +58,49 @@ export class GameRenderer {
         this.ctx.stroke();
     }
 
-    fillGrid() {
+    fillGrid(update, dt, onUpdateConsumed) {
         const cellsPtr = this.game.cells();
         const cells = new Uint32Array(memory.buffer, cellsPtr, GRID_SIZE * GRID_SIZE);
+
+        if (update) {
+            update.dt += dt;
+            if (update.dt > MOVE_ANIMATE_TIME) {
+                update.dt = 0;
+                onUpdateConsumed();
+            }
+        }
 
         this.ctx.beginPath();
 
         for (let i = 0; i < GRID_SIZE; i++) {
             for (let j = 0; j < GRID_SIZE; j++) {
                 const idx = getIndex(j, i);
-                if (cells[idx] === 0) continue;
-                this.renderCell(cells[idx], j, i);
+                let x = j, y = i, value = cells[idx];
+                if (update && update.dt > 0) {
+                    let m = update.moves.find(move => move.before.x === x && move.before.y === y);
+                    if (m) {
+                        if (!m.done) {
+                            m.done = 0;
+                        }
+                        m.done += dt / MOVE_ANIMATE_TIME;
+                        if (m.done < 1) {
+                            x += (m.after.x - m.before.x) * m.done;
+                            y += (m.after.y - m.before.y) * m.done;
+                            value = m.value;
+                        } else {
+                            update.moves = update.moves.filter(move => !(move.before.x === x && move.before.y === y));
+                        }
+                    } else if (update.new_piece.x === x && update.new_piece.y === y) {
+                        value = 0;
+                    } else {
+                        m = update.moves.find(move => move.after.x == x && move.after.y === y);
+                        if (m) {
+                            value = 0;
+                        }
+                    }
+                }
+                if (value === 0) continue;
+                this.renderCell(value, x, y);
             }
         }
         this.ctx.stroke();

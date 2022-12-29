@@ -1,7 +1,8 @@
 mod grid;
 mod utils;
 
-use grid::Grid;
+use grid::{Grid, GridCoord, MoveTransition};
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
 use crate::{
@@ -32,6 +33,13 @@ pub enum GameState {
     Over,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct GameUpdate {
+    moves: Vec<MoveTransition>,
+    new_piece: GridCoord,
+    score: u32,
+}
+
 #[wasm_bindgen]
 impl Game {
     pub fn new() -> Self {
@@ -58,18 +66,23 @@ impl Game {
         game
     }
 
-    pub fn play_swipe(&mut self, direction: Direction) -> Result<(), String> {
+    pub fn play_swipe(&mut self, direction: Direction) -> Result<JsValue, String> {
         if self.state == GameState::Over {
             return Err("The game is over".into());
         }
-        if let Ok(score) = self.grid.move_cells(direction) {
+        if let Ok((score, moves)) = self.grid.move_cells(direction) {
             self.score += score;
             // add a random piece
-            self.grid.add_at_random_position(Game::get_small_piece())?; // will never fail - since movement means at least one place was free
+            let new_piece = self.grid.add_at_random_position(Game::get_small_piece())?; // will never fail - since movement means at least one place was free
             if self.grid.is_game_over() {
                 self.state = GameState::Over;
             }
-            Ok(())
+            let update = GameUpdate {
+                moves,
+                score,
+                new_piece,
+            };
+            Ok(serde_wasm_bindgen::to_value(&update).unwrap())
         } else {
             Err("Illegal move".into())
         }
