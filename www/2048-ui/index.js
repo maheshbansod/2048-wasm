@@ -52,7 +52,7 @@ const onMoveSuccess = (update) => {
 const restartGame = () => {
     game.reset();
     gameStateElem.classList.add('hidden');
-    updateHighScore();
+    updateScore();
 };
 
 document.getElementById('try-again-btn').addEventListener('click', restartGame);
